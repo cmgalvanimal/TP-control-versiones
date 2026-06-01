@@ -36,26 +36,20 @@ COLUMNAS_NUMERICAS = [
     "CrdR",
 ]
 
+ruta_datos = RUTA_PROYECTO / "data" / "jugadores_2024_2025.csv"
+cargador = CargaDatos(ruta_datos)
 
-def main():
-    ruta_datos = RUTA_PROYECTO / "data" / "jugadores_2024_2025.csv"
-    cargador = CargaDatos(ruta_datos)
+cargador.cargar_datos()
+cargador.mostrar_dimensiones()
 
-    cargador.cargar_datos()
-    cargador.mostrar_dimensiones()
+print()
+cargador.mostrar_primeras_filas(n=5)
 
-    print()
-    cargador.mostrar_primeras_filas(n=5)
+print()
+cargador.mostrar_informacion()
 
-    print()
-    cargador.mostrar_informacion()
+print()
+cargador.mostrar_valores_faltantes(n=10)
 
-    print()
-    cargador.mostrar_valores_faltantes(n=10)
-
-    print()
-    cargador.mostrar_resumen_numerico(columnas=COLUMNAS_NUMERICAS)
-
-
-if __name__ == "__main__":
-    main()
+print()
+cargador.mostrar_resumen_numerico(columnas=COLUMNAS_NUMERICAS)
