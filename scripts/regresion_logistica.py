@@ -28,7 +28,7 @@ n_train = int(n*0.8)
 n_test = n - n_train
 random.seed(10)
 indices_train = random.sample(range(n), n_train)
-#print(f'Índices seleccionados para train: {indices_train}')
+
 datos_test = df.drop(indices_train)
 print(f'Tamaño de datos_test: {len(datos_test)}')
 datos_train = df.iloc[indices_train]
@@ -95,7 +95,9 @@ plt.title('curva ROC, Modelo 1')
 plt.xlabel('1 - Especificidad')
 plt.ylabel('Sensibilidad')
 
-tabla1 =  pd.DataFrame({
+#Armamos la matriz de confusión del primer modelo
+
+tabla1 =  pd.DataFrame({ 
     'y_test=1': [np.sum((y_pred == 1) & (y_test == 1)), np.sum((y_pred == 0) & (y_test == 1))],
     'y_test=0': [np.sum((y_pred == 1) & (y_test == 0)), np.sum((y_pred == 0) & (y_test == 0))],
 
@@ -158,6 +160,8 @@ plt.subplot(1,2,2)
 plt.title('curva ROC, Modelo 2')
 plt.xlabel('1 - Especificidad')
 plt.ylabel('Sensibilidad')
+
+#Armamos la matriz de confusión del segundo modelo
 
 tabla2 =  pd.DataFrame({
     'y_test=1': [np.sum((y_pred == 1) & (y_test == 1)), np.sum((y_pred == 0) & (y_test == 1))],
