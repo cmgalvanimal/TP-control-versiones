@@ -1,12 +1,13 @@
-from pathlib import Path
 import sys
-
+from pathlib import Path
 
 RUTA_PROYECTO = Path(__file__).resolve().parents[1]
 sys.path.append(str(RUTA_PROYECTO))
 
-from src.carga_datos import CargaDatos
+import statsmodels.api as sm
 
+from src.carga_datos import CargaDatos
+from src.models.main_model import BusquedaModelo
 
 COLUMNAS_NUMERICAS = [
     "Age",
@@ -55,6 +56,16 @@ def main():
 
     print()
     cargador.mostrar_resumen_numerico(columnas=COLUMNAS_NUMERICAS)
+
+    print()
+    busqueda = BusquedaModelo(cargador.obtener_datos())
+
+    modelo = busqueda.buscar_mejor_modelo()
+
+    print("\n")
+    print(modelo.summary())
+
+    modelo.graficar()
 
 
 if __name__ == "__main__":
