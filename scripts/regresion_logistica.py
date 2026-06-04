@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 import random
 import pandas as pd
 from sklearn.metrics import auc
-from src.carga_datos import CargaDatos
 
 RUTA_PROYECTO = Path(__file__).resolve().parents[1]
 sys.path.append(str(RUTA_PROYECTO))
+
+from src.carga_datos import CargaDatos
 
 ruta_datos = RUTA_PROYECTO / "data" / "jugadores_2024_2025.csv"
 cargador = CargaDatos(ruta_datos)
@@ -170,3 +171,9 @@ AUC = auc(1- np.array(especificidad),sensibilidad)
 print(f'Modelo 2 \n Sensibilidad {sens:.3f} \n Especificidad {espec:.3f} \n AUC {AUC:.3f} \n Error de mala clasificación total {(tabla2.iloc[0,1] + tabla2.iloc[1,0])/len(y_test):.3f} \n Youden {max(J):.3f} \n Punto p de corte {p:.3f}') 
 
 plt.show()
+
+'''
+Elegimos el modelo 2, ya que es el que mayor AUC tiene, además de que tiene mejor sensibilidad y especificidad, y una menos proporción de error.
+El modelo nos dice que:
+En función a los minutos jugados y la posición del jugador, varía la probabilidad de que haya metido gol durante la temporada.
+'''
