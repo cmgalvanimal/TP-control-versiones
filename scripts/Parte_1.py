@@ -62,3 +62,21 @@ print("coeficiente de correlación goles_esp: ", goles_esp.corr(goles))
 
 # La mejor correlación la presenta "goles_esp". Se escoge esta variable
 
+# Ajuste lineal
+X = sm.add_constant(goles_esp)
+modelo = sm.OLS(goles, X)
+resultado = modelo.fit()
+a = resultado.params.iloc[1]
+b = resultado.params.iloc[0]
+
+# p-valor bajo la hipótesis de que la pendiente es nula
+print("p-valor para la pendiente: ", resultado.pvalues.iloc[1])
+
+# Gráfico de puntos con recta de ajuste
+fig, ax = plt.subplots()
+ax.scatter(goles_esp, goles, color="blue")
+ax.axline((0,b), (1,a+b), color="red")
+ax.set_title("Goles marcados vs goles esperados")
+ax.set_xlabel("Goles esperados")
+ax.set_ylabel("Goles marcados")
+plt.show()
