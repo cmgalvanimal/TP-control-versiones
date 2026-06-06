@@ -1,6 +1,7 @@
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
+import statsmodels.api as sm
 
 ruta = r"data\jugadores_2024_2025.csv"
 df = pd.read_csv(ruta, delimiter=",")
@@ -50,3 +51,14 @@ ax[3,2].scatter(conduc_prog, goles, s=10)
 ax[3,2].set_title("vs conduc_prog")
 plt.tight_layout()
 plt.show()
+
+# Hay 3 variables que parecen presentar un comportamiento lineal respecto a "goles":
+# tiros_tot, tiros_arco, goles_esp
+
+# Coeficientes de correlación para estas 3 variables
+print("coeficiente de correlación tiros_tot: ", tiros_tot.corr(goles))
+print("coeficiente de correlación tiros_arco: ", tiros_arco.corr(goles))
+print("coeficiente de correlación goles_esp: ", goles_esp.corr(goles))
+
+# La mejor correlación la presenta "goles_esp". Se escoge esta variable
+
