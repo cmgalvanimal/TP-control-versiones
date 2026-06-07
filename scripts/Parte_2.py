@@ -50,6 +50,7 @@ x = np.stack((
 X = sm.add_constant(x)
 mod1 = sm.OLS(goles, X)
 res1 = mod1.fit()
+print("---------------- Ajuste 1")
 print("p-valor minutos: ", res1.pvalues.iloc[1])
 print("p-valor tiros_tot: ", res1.pvalues.iloc[2])
 print("p-valor tiros_arco: ", res1.pvalues.iloc[3])
@@ -69,7 +70,7 @@ x = np.stack((tiros_tot, tiros_arco, goles_esp, acciones), axis=1)
 X = sm.add_constant(x)
 mod2 = sm.OLS(goles, X)
 res2 = mod2.fit()
-print("----------------")
+print("---------------- Ajuste 2")
 print("p-valor tiros_tot: ", res2.pvalues.iloc[1])
 print("p-valor tiros_arco: ", res2.pvalues.iloc[2])
 print("p-valor goles_esp: ", res2.pvalues.iloc[3])
@@ -80,7 +81,7 @@ x = np.stack((minutos, pases, intercepc, conduc, conduc_p), axis=1)
 X = sm.add_constant(x)
 mod3 = sm.OLS(goles, X)
 res3 = mod3.fit()
-print("----------------")
+print("---------------- Ajuste 3")
 print("p-valor minutos: ", res3.pvalues.iloc[1])
 print("p-valor pases: ", res3.pvalues.iloc[2])
 print("p-valor intercepc: ", res3.pvalues.iloc[3])
@@ -90,3 +91,33 @@ print("p-valor conduc_p: ", res3.pvalues.iloc[5])
 # Todos los p-valores menos de 0.05. Se mezclan ambos grupos.
 # Grupo A: tiros_arco, goles_esp, pases, intercepc, conduc_p
 # Grupo B: minutos, tiros_tot, acciones, conduc
+
+# Ajuste multilineal 4, grupo A
+x = np.stack((
+    tiros_arco, goles_esp, pases, intercepc, conduc_p
+), axis=1)
+X = sm.add_constant(x)
+mod4 = sm.OLS(goles, X)
+res4 = mod4.fit()
+print("---------------- Ajuste 4")
+print("p-valor tiros_arco: ", res4.pvalues.iloc[1])
+print("p-valor goles_esp: ", res4.pvalues.iloc[2])
+print("p-valor pases: ", res4.pvalues.iloc[3])
+print("p-valor intercepc: ", res4.pvalues.iloc[4])
+print("p-valor conduc_p: ", res4.pvalues.iloc[5])
+
+# Ajuste multilineal 5, grupo B
+x = np.stack((
+    minutos, tiros_tot, acciones, conduc
+), axis=1)
+X = sm.add_constant(x)
+mod5 = sm.OLS(goles, X)
+res5 = mod5.fit()
+print("---------------- Ajuste 5")
+print("p-valor minutos: ", res5.pvalues.iloc[1])
+print("p-valor tiros_tot: ", res5.pvalues.iloc[2])
+print("p-valor acciones: ", res5.pvalues.iloc[3])
+print("p-valor conduc: ", res5.pvalues.iloc[4])
+
+# Si se toma como valor de referencia 0.001, los p-valores más
+# pequeños corresponden al grupo 1 + conduc (grupo 1+)
