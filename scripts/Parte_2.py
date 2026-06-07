@@ -41,3 +41,13 @@ for i in range(n):
         acciones.drop(acciones.index[i], inplace=True)
         conduc.drop(conduc.index[i], inplace=True)
         conduc_p.drop(conduc_p.index[i], inplace=True)
+
+# Ajuste multilineal 1
+x = np.stack((
+    minutos, tiros_tot, tiros_arco, goles_esp, pases,
+    intercepc, acciones, conduc, conduc_p
+), axis=1)
+X = sm.add_constant(x)
+mod1 = sm.OLS(goles, X)
+res1 = mod1.fit()
+print(res1.summary())
