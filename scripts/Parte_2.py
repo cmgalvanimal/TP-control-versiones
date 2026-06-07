@@ -121,3 +121,15 @@ print("p-valor conduc: ", res5.pvalues.iloc[4])
 
 # Si se toma como valor de referencia 0.001, los p-valores más
 # pequeños corresponden al grupo 1 + conduc (grupo 1+)
+
+# Ajuste multilineal 6, grupo 1+
+x = np.stack((tiros_tot, tiros_arco, goles_esp, acciones, conduc), axis=1)
+X = sm.add_constant(x)
+mod6 = sm.OLS(goles, X)
+res6 = mod6.fit()
+print("---------------- Ajuste 6")
+print("p-valor tiros_tot: ", res6.pvalues.iloc[1])
+print("p-valor tiros_arco: ", res6.pvalues.iloc[2])
+print("p-valor goles_esp: ", res6.pvalues.iloc[3])
+print("p-valor acciones: ", res6.pvalues.iloc[4])
+print("p-valor conduc: ", res6.pvalues.iloc[5])
