@@ -7,6 +7,14 @@ import numpy as np
 ruta = r"data\jugadores_2024_2025.csv"
 df = pd.read_csv(ruta, delimiter=",")
 
+# Planteo.
+# El archivo cargado consta de 2854 filas, cada una correspondiente
+# al desempeño de un jugador en un equipo y competencia determinados. Cada
+# fila consta de 30 variables, entre ellas la cantidad de goles marcados.
+# Se busca determinar si es posible relacionar linealmente esta variable
+# con alguna de las otras, de forma tal que permita hacer predicciones
+# sobre la cantidad de goles marcados.
+
 # Variable observada
 goles = df["Gls"]
 
@@ -85,6 +93,11 @@ b = resultado.params.iloc[0]
 # p-valor bajo la hipótesis de que la pendiente es nula
 print("p-valor para la pendiente: ", resultado.pvalues.iloc[1])
 
+# Estimación del error estándar
+SE_hat = np.sum((goles - a*goles_esp - b)**2)
+SE_hat = np.sqrt(SE_hat/(len(goles)-1))
+print("Error estándar: ", SE_hat)
+
 # Gráfico de puntos con recta de ajuste
 fig, ax = plt.subplots()
 ax.scatter(goles_esp, goles, color="blue")
@@ -93,3 +106,10 @@ ax.set_title("Goles marcados vs goles esperados")
 ax.set_xlabel("Goles esperados")
 ax.set_ylabel("Goles marcados")
 plt.show()
+
+# Conclusión.
+# Con respecto a la relación entre goles esperados y goles marcados, el
+# coeficiente de Pearson es de 0.93 y el p-valor asociado a la pendiente
+# es 0. Esto significa que efectivamente hay una relación lineal entre
+# ambas. El error estándar estimado para las predicciones es de
+# aproximadamente 1 gol.
