@@ -7,6 +7,14 @@ import numpy as np
 ruta = r"data\jugadores_2024_2025.csv"
 df = pd.read_csv(ruta, delimiter=",")
 
+# Planteo.
+# El archivo cargado consta de 2854 filas, cada una correspondiente
+# al desempeño de un jugador en un equipo y competencia determinados. Cada
+# fila consta de 30 variables, entre ellas la cantidad de goles marcados.
+# Se busca determinar si es posible relacionar linealmente esta variable
+# con algunas de las otras, de forma tal que permita hacer predicciones
+# sobre la cantidad de goles marcados.
+
 # Variable observada
 goles = df["Gls"]
 
@@ -41,6 +49,29 @@ for i in range(n):
         acciones.drop(acciones.index[i], inplace=True)
         conduc.drop(conduc.index[i], inplace=True)#
         conduc_p.drop(conduc_p.index[i], inplace=True)#
+
+# Gráficos de dispesión
+fig, ax = plt.subplots(3, 3)
+ax[0,0].scatter(minutos, goles, s=10)
+ax[0,0].set_title("vs minutos")
+ax[0,1].scatter(tiros_tot, goles, s=10)
+ax[0,1].set_title("vs tiros_tot")
+ax[0,2].scatter(tiros_arco, goles, s=10)
+ax[0,2].set_title("vs tiros_arco")
+ax[1,0].scatter(goles_esp, goles, s=10)
+ax[1,0].set_title("vs goles_esp")
+ax[1,1].scatter(pases, goles, s=10)
+ax[1,1].set_title("vs pases")
+ax[1,2].scatter(intercepc, goles, s=10)
+ax[1,2].set_title("vs intercepciones")
+ax[2,0].scatter(acciones, goles, s=10)
+ax[2,0].set_title("vs acciones")
+ax[2,1].scatter(conduc, goles, s=10)
+ax[2,1].set_title("vs conduc")
+ax[2,2].scatter(conduc_p, goles, s=10)
+ax[2,2].set_title("vs conduc_prog")
+plt.tight_layout()
+plt.show()
 
 # Ajuste multilineal 1, 9 variables
 x = np.stack((
@@ -133,3 +164,16 @@ print("p-valor tiros_arco: ", res6.pvalues.iloc[2])
 print("p-valor goles_esp: ", res6.pvalues.iloc[3])
 print("p-valor acciones: ", res6.pvalues.iloc[4])
 print("p-valor conduc: ", res6.pvalues.iloc[5])
+
+# Conclusión.
+# Teniendo en cuenta los resultados obtenidos, se propone utilizar como
+# variables predictoras "tiros_tot", "tiros_arco" y "goles_esp". A
+# continuación se realiza el ajuste correspondiente.
+
+# Ajuste multilineal 7
+x = np.stack((tiros_tot, tiros_arco, goles_esp), axis=1)
+X = sm.add_constant(x)
+mod7 = sm.OLS(goles, X)
+res7 = mod7.fit()
+print("---------------- Ajuste 7")
+print(res7.summary())
