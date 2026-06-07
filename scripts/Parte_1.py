@@ -2,6 +2,7 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
+import numpy as np
 
 ruta = r"data\jugadores_2024_2025.csv"
 df = pd.read_csv(ruta, delimiter=",")
@@ -52,10 +53,22 @@ ax[3,2].set_title("vs conduc_prog")
 plt.tight_layout()
 plt.show()
 
-# Hay 3 variables que parecen presentar un comportamiento lineal respecto a "goles":
-# tiros_tot, tiros_arco, goles_esp
+# Hay 3 variables que parecen presentar un comportamiento lineal respecto a
+# "goles": "tiros_tot", "tiros_arco", "goles_esp".
 
-# Coeficientes de correlación para estas 3 variables
+# Eliminar filas incompletas (en las 4 columnas mencionadas)
+n = len(goles)
+for i in range(n):
+    if (
+        np.isnan(goles.iloc[i]) or np.isnan(tiros_tot.iloc[i]) or
+        np.isnan(tiros_arco.iloc[i]) or np.isnan(goles_esp.iloc[i])
+    ):
+        goles.drop(goles.index[i], inplace=True)
+        tiros_tot.drop(tiros_tot.index[i], inplace=True)
+        tiros_arco.drop(tiros_arco.index[i], inplace=True)
+        goles_esp.drop(goles_esp.index[i], inplace=True)
+
+# Coeficientes de correlación para las 3 variables mencionadas
 print("coeficiente de correlación tiros_tot: ", tiros_tot.corr(goles))
 print("coeficiente de correlación tiros_arco: ", tiros_arco.corr(goles))
 print("coeficiente de correlación goles_esp: ", goles_esp.corr(goles))
