@@ -60,10 +60,11 @@ print("p-valor acciones: ", res1.pvalues.iloc[7])
 print("p-valor conduc: ", res1.pvalues.iloc[8])
 print("p-valor conduc_p: ", res1.pvalues.iloc[9])
 
-# Dados los p-valores obtenidos, se seleccionan las siguientes variables:
-# tiros_tot, tiros_arco, goles_esp, acciones
+# Dados los p-valores obtenidos, se separan las variables en 2 grupos:
+# Grupo 1: tiros_tot, tiros_arco, goles_esp, acciones
+# Grupo 2: minutos, pases, intercepc, conduc, conduc_p
 
-# Ajuste multilineal 2, 4 variables
+# Ajuste multilineal 2, grupo 1
 x = np.stack((tiros_tot, tiros_arco, goles_esp, acciones), axis=1)
 X = sm.add_constant(x)
 mod2 = sm.OLS(goles, X)
@@ -74,5 +75,18 @@ print("p-valor tiros_arco: ", res2.pvalues.iloc[2])
 print("p-valor goles_esp: ", res2.pvalues.iloc[3])
 print("p-valor acciones: ", res2.pvalues.iloc[4])
 
-# Dados los p-valores obtenidos se rechaza la hipótesis de que
-# alguna de las 4 pendientes sea nula
+# Ajuste multilineal 3, grupo 2
+x = np.stack((minutos, pases, intercepc, conduc, conduc_p), axis=1)
+X = sm.add_constant(x)
+mod3 = sm.OLS(goles, X)
+res3 = mod3.fit()
+print("----------------")
+print("p-valor minutos: ", res3.pvalues.iloc[1])
+print("p-valor pases: ", res3.pvalues.iloc[2])
+print("p-valor intercepc: ", res3.pvalues.iloc[3])
+print("p-valor conduc: ", res3.pvalues.iloc[4])
+print("p-valor conduc_p: ", res3.pvalues.iloc[5])
+
+# Todos los p-valores menos de 0.05. Se mezclan ambos grupos.
+# Grupo A: tiros_arco, goles_esp, pases, intercepc, conduc_p
+# Grupo B: minutos, tiros_tot, acciones, conduc
