@@ -1,0 +1,54 @@
+import sys
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import numpy as np
+
+ruta = r"data\jugadores_2024_2025.csv"
+df = pd.read_csv(ruta, delimiter=",")
+
+# Planteo.
+# El archivo cargado consta de 2854 filas, cada una correspondiente
+# al desempeño de un jugador en un equipo y competencia determinados. Cada
+# fila consta de 30 variables, entre ellas la cantidad de goles marcados.
+# Se busca determinar si es posible estimar la probabilidad de que un
+# jugador haya marcado al menos un gol, utilizando para ello variables
+# predictoras adecuadas y un modelo logístico.
+
+# Variable observada
+goles = 1 * (df["Gls"] > 0)
+
+# Posibles variables predictoras según criterios lógicos
+minutos = df["Min"]
+tiros_tot = df["Sh"]
+tiros_arco = df["SoT"]
+goles_esp = df["xG"]
+pases = df["Cmp"]
+intercepc = df["Int"]
+acciones = df["SCA"]
+conduc = df["Carries"]
+conduc_p = df["PrgC"]
+
+# En la parte 2 se comprobó que no hay filas incompletas para estas 9 variables.
+
+# Ajuste logístico 1, 9 variables
+x = np.stack((
+    minutos, tiros_tot, tiros_arco, goles_esp, pases,
+    intercepc, acciones, conduc, conduc_p
+), axis=1)
+X = sm.add_constant(x)
+mod1 = sm.Logit(goles, X)
+res1 = mod1.fit()
+print("---------------- Ajuste 1")
+print("p-valor minutos: ", res1.pvalues.iloc[1])
+print("p-valor tiros_tot: ", res1.pvalues.iloc[2])
+print("p-valor tiros_arco: ", res1.pvalues.iloc[3])
+print("p-valor goles_esp: ", res1.pvalues.iloc[4])
+print("p-valor pases: ", res1.pvalues.iloc[5])
+print("p-valor intercepc: ", res1.pvalues.iloc[6])
+print("p-valor acciones: ", res1.pvalues.iloc[7])
+print("p-valor conduc: ", res1.pvalues.iloc[8])
+print("p-valor conduc_p: ", res1.pvalues.iloc[9])
+
+# Hay 3 variables cuyo p-valor es mucho más bajo que los demás:
+# tiros_tot, tiros_arco, goles_esp
