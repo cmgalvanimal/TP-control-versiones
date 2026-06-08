@@ -31,6 +31,29 @@ conduc_p = df["PrgC"]
 
 # En la parte 2 se comprobó que no hay filas incompletas para estas 9 variables.
 
+# Gráficos
+fig, ax = plt.subplots(3, 3)
+ax[0,0].scatter(minutos, goles, s=10)
+ax[0,0].set_title("vs minutos")
+ax[0,1].scatter(tiros_tot, goles, s=10)
+ax[0,1].set_title("vs tiros_tot")
+ax[0,2].scatter(tiros_arco, goles, s=10)
+ax[0,2].set_title("vs tiros_arco")
+ax[1,0].scatter(goles_esp, goles, s=10)
+ax[1,0].set_title("vs goles_esp")
+ax[1,1].scatter(pases, goles, s=10)
+ax[1,1].set_title("vs pases")
+ax[1,2].scatter(intercepc, goles, s=10)
+ax[1,2].set_title("vs intercepciones")
+ax[2,0].scatter(acciones, goles, s=10)
+ax[2,0].set_title("vs acciones")
+ax[2,1].scatter(conduc, goles, s=10)
+ax[2,1].set_title("vs conduc")
+ax[2,2].scatter(conduc_p, goles, s=10)
+ax[2,2].set_title("vs conduc_prog")
+plt.tight_layout()
+plt.show()
+
 # Ajuste logístico 1, 9 variables
 x = np.stack((
     minutos, tiros_tot, tiros_arco, goles_esp, pases,
