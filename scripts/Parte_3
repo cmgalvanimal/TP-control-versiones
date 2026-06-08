@@ -100,3 +100,32 @@ print("p-valor conduc_p: ", res4.pvalues.iloc[3])
 
 # De los ajustes 3 y 4 se toman las 5 variables que mostraron un
 # p-valor muy bajo respecto al resto. Con ellas se hace el ajuste 5.
+
+# Ajuste logístico 5
+x = np.stack((
+    minutos, tiros_tot, tiros_arco, goles_esp, conduc_p
+), axis=1)
+X = sm.add_constant(x)
+mod5 = sm.Logit(goles, X)
+res5 = mod5.fit()
+print("---------------- Ajuste 5")
+print("p-valor minutos: ", res5.pvalues.iloc[1])
+print("p-valor tiros_tot: ", res5.pvalues.iloc[2])
+print("p-valor tiros_arco: ", res5.pvalues.iloc[3])
+print("p-valor goles_esp: ", res5.pvalues.iloc[4])
+print("p-valor conduc_p: ", res5.pvalues.iloc[5])
+
+# Conclusión.
+# Teniendo en cuenta los resultados obtenidos, se propone utilizar como
+# variables predictoras "tiros_tot", "tiros_arco" y "goles_esp". A
+# continuación se realiza el ajuste correspondiente.
+
+# Ajuste logístico 6
+x = np.stack((
+    tiros_tot, tiros_arco, goles_esp
+), axis=1)
+X = sm.add_constant(x)
+mod6 = sm.Logit(goles, X)
+res6 = mod6.fit()
+print("---------------- Ajuste 6")
+print(res6.summary())
