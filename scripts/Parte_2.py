@@ -1,0 +1,179 @@
+import sys
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import numpy as np
+
+ruta = r"data\jugadores_2024_2025.csv"
+df = pd.read_csv(ruta, delimiter=",")
+
+# Planteo.
+# El archivo cargado consta de 2854 filas, cada una correspondiente
+# al desempeño de un jugador en un equipo y competencia determinados. Cada
+# fila consta de 30 variables, entre ellas la cantidad de goles marcados.
+# Se busca determinar si es posible relacionar linealmente esta variable
+# con algunas de las otras, de forma tal que permita hacer predicciones
+# sobre la cantidad de goles marcados.
+
+# Variable observada
+goles = df["Gls"]
+
+# Posibles variables predictoras según criterios lógicos
+minutos = df["Min"]
+tiros_tot = df["Sh"]
+tiros_arco = df["SoT"]
+goles_esp = df["xG"]
+pases = df["Cmp"]
+intercepc = df["Int"]
+acciones = df["SCA"]
+conduc = df["Carries"]
+conduc_p = df["PrgC"]
+
+# Eliminar filas incompletas
+n = len(goles)
+for i in range(n):
+    if (
+        np.isnan(goles.iloc[i]) or np.isnan(minutos.iloc[i]) or
+        np.isnan(tiros_tot.iloc[i]) or np.isnan(tiros_arco.iloc[i]) or
+        np.isnan(goles_esp.iloc[i]) or np.isnan(pases.iloc[i]) or
+        np.isnan(intercepc.iloc[i]) or np.isnan(acciones.iloc[i]) or
+        np.isnan(conduc.iloc[i]) or np.isnan(conduc_p.iloc[i])
+    ):
+        goles.drop(goles.index[i], inplace=True)
+        minutos.drop(minutos.index[i], inplace=True)#
+        tiros_tot.drop(tiros_tot.index[i], inplace=True)
+        tiros_arco.drop(tiros_arco.index[i], inplace=True)
+        goles_esp.drop(goles_esp.index[i], inplace=True)
+        pases.drop(pases.index[i], inplace=True)#
+        intercepc.drop(intercepc.index[i], inplace=True)#
+        acciones.drop(acciones.index[i], inplace=True)
+        conduc.drop(conduc.index[i], inplace=True)#
+        conduc_p.drop(conduc_p.index[i], inplace=True)#
+
+# Gráficos de dispesión
+fig, ax = plt.subplots(3, 3)
+ax[0,0].scatter(minutos, goles, s=10)
+ax[0,0].set_title("vs minutos")
+ax[0,1].scatter(tiros_tot, goles, s=10)
+ax[0,1].set_title("vs tiros_tot")
+ax[0,2].scatter(tiros_arco, goles, s=10)
+ax[0,2].set_title("vs tiros_arco")
+ax[1,0].scatter(goles_esp, goles, s=10)
+ax[1,0].set_title("vs goles_esp")
+ax[1,1].scatter(pases, goles, s=10)
+ax[1,1].set_title("vs pases")
+ax[1,2].scatter(intercepc, goles, s=10)
+ax[1,2].set_title("vs intercepciones")
+ax[2,0].scatter(acciones, goles, s=10)
+ax[2,0].set_title("vs acciones")
+ax[2,1].scatter(conduc, goles, s=10)
+ax[2,1].set_title("vs conduc")
+ax[2,2].scatter(conduc_p, goles, s=10)
+ax[2,2].set_title("vs conduc_prog")
+plt.tight_layout()
+plt.show()
+
+# Ajuste multilineal 1, 9 variables
+x = np.stack((
+    minutos, tiros_tot, tiros_arco, goles_esp, pases,
+    intercepc, acciones, conduc, conduc_p
+), axis=1)
+X = sm.add_constant(x)
+mod1 = sm.OLS(goles, X)
+res1 = mod1.fit()
+print("---------------- Ajuste 1")
+print("p-valor minutos: ", res1.pvalues.iloc[1])
+print("p-valor tiros_tot: ", res1.pvalues.iloc[2])
+print("p-valor tiros_arco: ", res1.pvalues.iloc[3])
+print("p-valor goles_esp: ", res1.pvalues.iloc[4])
+print("p-valor pases: ", res1.pvalues.iloc[5])
+print("p-valor intercepc: ", res1.pvalues.iloc[6])
+print("p-valor acciones: ", res1.pvalues.iloc[7])
+print("p-valor conduc: ", res1.pvalues.iloc[8])
+print("p-valor conduc_p: ", res1.pvalues.iloc[9])
+
+# Dados los p-valores obtenidos, se separan las variables en 2 grupos:
+# Grupo 1: tiros_tot, tiros_arco, goles_esp, acciones
+# Grupo 2: minutos, pases, intercepc, conduc, conduc_p
+
+# Ajuste multilineal 2, grupo 1
+x = np.stack((tiros_tot, tiros_arco, goles_esp, acciones), axis=1)
+X = sm.add_constant(x)
+mod2 = sm.OLS(goles, X)
+res2 = mod2.fit()
+print("---------------- Ajuste 2")
+print("p-valor tiros_tot: ", res2.pvalues.iloc[1])
+print("p-valor tiros_arco: ", res2.pvalues.iloc[2])
+print("p-valor goles_esp: ", res2.pvalues.iloc[3])
+print("p-valor acciones: ", res2.pvalues.iloc[4])
+
+# Ajuste multilineal 3, grupo 2
+x = np.stack((minutos, pases, intercepc, conduc, conduc_p), axis=1)
+X = sm.add_constant(x)
+mod3 = sm.OLS(goles, X)
+res3 = mod3.fit()
+print("---------------- Ajuste 3")
+print("p-valor minutos: ", res3.pvalues.iloc[1])
+print("p-valor pases: ", res3.pvalues.iloc[2])
+print("p-valor intercepc: ", res3.pvalues.iloc[3])
+print("p-valor conduc: ", res3.pvalues.iloc[4])
+print("p-valor conduc_p: ", res3.pvalues.iloc[5])
+
+# Todos los p-valores menos de 0.05. Se mezclan ambos grupos.
+# Grupo A: tiros_arco, goles_esp, pases, intercepc, conduc_p
+# Grupo B: minutos, tiros_tot, acciones, conduc
+
+# Ajuste multilineal 4, grupo A
+x = np.stack((
+    tiros_arco, goles_esp, pases, intercepc, conduc_p
+), axis=1)
+X = sm.add_constant(x)
+mod4 = sm.OLS(goles, X)
+res4 = mod4.fit()
+print("---------------- Ajuste 4")
+print("p-valor tiros_arco: ", res4.pvalues.iloc[1])
+print("p-valor goles_esp: ", res4.pvalues.iloc[2])
+print("p-valor pases: ", res4.pvalues.iloc[3])
+print("p-valor intercepc: ", res4.pvalues.iloc[4])
+print("p-valor conduc_p: ", res4.pvalues.iloc[5])
+
+# Ajuste multilineal 5, grupo B
+x = np.stack((
+    minutos, tiros_tot, acciones, conduc
+), axis=1)
+X = sm.add_constant(x)
+mod5 = sm.OLS(goles, X)
+res5 = mod5.fit()
+print("---------------- Ajuste 5")
+print("p-valor minutos: ", res5.pvalues.iloc[1])
+print("p-valor tiros_tot: ", res5.pvalues.iloc[2])
+print("p-valor acciones: ", res5.pvalues.iloc[3])
+print("p-valor conduc: ", res5.pvalues.iloc[4])
+
+# Si se toma como valor de referencia 0.001, los p-valores más
+# pequeños corresponden al grupo 1 + conduc (grupo 1+)
+
+# Ajuste multilineal 6, grupo 1+
+x = np.stack((tiros_tot, tiros_arco, goles_esp, acciones, conduc), axis=1)
+X = sm.add_constant(x)
+mod6 = sm.OLS(goles, X)
+res6 = mod6.fit()
+print("---------------- Ajuste 6")
+print("p-valor tiros_tot: ", res6.pvalues.iloc[1])
+print("p-valor tiros_arco: ", res6.pvalues.iloc[2])
+print("p-valor goles_esp: ", res6.pvalues.iloc[3])
+print("p-valor acciones: ", res6.pvalues.iloc[4])
+print("p-valor conduc: ", res6.pvalues.iloc[5])
+
+# Conclusión.
+# Teniendo en cuenta los resultados obtenidos, se propone utilizar como
+# variables predictoras "tiros_tot", "tiros_arco" y "goles_esp". A
+# continuación se realiza el ajuste correspondiente.
+
+# Ajuste multilineal 7
+x = np.stack((tiros_tot, tiros_arco, goles_esp), axis=1)
+X = sm.add_constant(x)
+mod7 = sm.OLS(goles, X)
+res7 = mod7.fit()
+print("---------------- Ajuste 7")
+print(res7.summary())
